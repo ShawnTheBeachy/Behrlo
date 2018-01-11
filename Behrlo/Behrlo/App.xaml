@@ -1,0 +1,42 @@
+﻿<common:BootStrapper x:Class="Behrlo.App"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:common="using:Template10.Common"
+                     xmlns:t10converters="using:Template10.Converters"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles\Custom.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <t10converters:ValueWhenConverter x:Key="NullToFalse"
+                                              When="{x:Null}">
+
+                <t10converters:ValueWhenConverter.Value>
+                    <x:Boolean>False</x:Boolean>
+                </t10converters:ValueWhenConverter.Value>
+                <t10converters:ValueWhenConverter.Otherwise>
+                    <x:Boolean>True</x:Boolean>
+                </t10converters:ValueWhenConverter.Otherwise>
+
+            </t10converters:ValueWhenConverter>
+            
+            <t10converters:ValueWhenConverter x:Key="ZeroToFalse">
+
+                <t10converters:ValueWhenConverter.When>
+                    <x:Int32>0</x:Int32>
+                </t10converters:ValueWhenConverter.When>
+                <t10converters:ValueWhenConverter.Value>
+                    <x:Boolean>False</x:Boolean>
+                </t10converters:ValueWhenConverter.Value>
+                <t10converters:ValueWhenConverter.Otherwise>
+                    <x:Boolean>True</x:Boolean>
+                </t10converters:ValueWhenConverter.Otherwise>
+
+            </t10converters:ValueWhenConverter>
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+</common:BootStrapper>
