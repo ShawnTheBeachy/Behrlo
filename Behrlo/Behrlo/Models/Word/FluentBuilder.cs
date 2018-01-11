@@ -2,7 +2,7 @@
 
 namespace Behrlo.Models
 {
-    public static class WordFluentInterface
+    public static class WordFluentBuilder
     {
         /// <summary>
         /// Sets the Section property.

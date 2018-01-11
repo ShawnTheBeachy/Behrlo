@@ -2,7 +2,7 @@
 
 namespace Behrlo.Models
 {
-    public static class SectionFluentInterface
+    public static class SectionFluentBuilder
     {
         /// <summary>
         /// Sets the Name property.

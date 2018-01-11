@@ -2,7 +2,7 @@
 
 namespace Behrlo.Models
 {
-    public static class NotebookFluentInterface
+    public static class NotebookFluentBuilder
     {
         /// <summary>
         /// Fluently sets the Id property.
