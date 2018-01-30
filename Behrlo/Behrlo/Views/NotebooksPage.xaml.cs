@@ -85,7 +85,7 @@ namespace Behrlo.Views
 
         private async void CoverImage_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            await (sender as FrameworkElement).Saturation(0, 3000, 50).StartAsync();
+            await (sender as FrameworkElement).Saturation(0.1, 3000, 50).StartAsync();
         }
 
         private async void CoverImage_PointerExited(object sender, PointerRoutedEventArgs e)

@@ -64,7 +64,7 @@
                             CommandParameter="{x:Bind ViewModel.NewWord, Mode=OneWay}"
                             Grid.Column="1"
                             HorizontalAlignment="Stretch"
-                            IsEnabled="{x:Bind NewWordTextBox.Text.Length, Mode=OneWay, Converter={StaticResource ZeroToFalse}}"
+                            IsEnabled="{x:Bind ViewModel.NewWord.Text.Length, Mode=OneWay, Converter={StaticResource ZeroToFalse}}"
                             Margin="6 0 0 0"
                             Style="{ThemeResource ButtonRevealStyle}" />
 
@@ -117,7 +117,7 @@
                             CommandParameter="{x:Bind ViewModel.NewSection, Mode=OneWay}"
                             Grid.Column="1"
                             HorizontalAlignment="Stretch"
-                            IsEnabled="{x:Bind NewSectionTextBox.Text.Length, Mode=OneWay, Converter={StaticResource ZeroToFalse}}"
+                            IsEnabled="{x:Bind ViewModel.NewSection.Name.Length, Mode=OneWay, Converter={StaticResource ZeroToFalse}}"
                             Margin="6 0 0 0"
                             Style="{ThemeResource ButtonRevealStyle}" />
 
@@ -126,6 +126,33 @@
             </RelativePanel>
 
         </Flyout>
+
+        <Flyout x:Name="RenameSectionFlyout">
+
+            <Flyout.FlyoutPresenterStyle>
+                <Style TargetType="FlyoutPresenter">
+                    <Setter Property="Background"
+                            Value="{ThemeResource SystemControlAcrylicElementBrush}" />
+                </Style>
+            </Flyout.FlyoutPresenterStyle>
+
+            <RelativePanel x:Name="RenameSectionPanel"
+                           Width="300">
+
+                <TextBox x:Name="RenameSectionTextBox"
+                         x:Uid="RenameSectionTextBox"
+                         LostFocus="RenameSectionTextBox_LostFocus"
+                         RelativePanel.AlignLeftWithPanel="True"
+                         RelativePanel.AlignRightWithPanel="True"
+                         Text="{x:Bind ViewModel.RenamingSectionName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            </RelativePanel>
+
+        </Flyout>
+
+        <CollectionViewSource x:Key="WordsViewSource"
+                              IsSourceGrouped="True"
+                              Source="{Binding Words, Mode=OneWay}" />
         
     </Page.Resources>
 
@@ -147,7 +174,8 @@
                         x:Uid="AddButton"
                         Click="AddSectionButton_Click"
                         HorizontalAlignment="Stretch"
-                        Margin="4" />
+                        Margin="4"
+                        Style="{ThemeResource ButtonRevealStyle}" />
 
             </ListView.Footer>
 
@@ -194,6 +222,9 @@
                                     </Style>
                                 </MenuFlyout.MenuFlyoutPresenterStyle>
 
+                                <MenuFlyoutItem x:Name="RenameSectionMenuItem"
+                                                x:Uid="RenameMenuItem"
+                                                Click="RenameSectionMenuItem_Click" />
                                 <MenuFlyoutItem x:Name="DeleteSectionMenuItem"
                                                 x:Uid="DeleteMenuItem"
                                                 Click="DeleteSectionMenuItem_Click" />
@@ -208,99 +239,130 @@
 
         </ListView>
 
-        <ListView x:Name="WordsListView"
-                  AutomationProperties.Name="WordsListView"
-                  Background="{ThemeResource SystemControlAcrylicWindowBrush}"
-                  ItemsSource="{x:Bind ViewModel.SelectedSection.Words, Mode=OneWay}"
-                  RelativePanel.AlignBottomWithPanel="True"
-                  RelativePanel.AlignTopWithPanel="True"
-                  RelativePanel.RightOf="SectionsListView"
-                  SelectedItem="{x:Bind ViewModel.SelectedWord, Mode=TwoWay}"
-                  Width="300">
+        <SemanticZoom x:Name="WordsSemanticZoom"
+                      Background="{ThemeResource SystemControlAcrylicWindowBrush}"
+                      RelativePanel.AlignBottomWithPanel="True"
+                      RelativePanel.AlignTopWithPanel="True"
+                      RelativePanel.RightOf="SectionsListView"
+                      Width="300">
 
-            <ListView.Footer>
+            <SemanticZoom.ZoomedInView>
 
-                <Button x:Name="AddWordButton"
-                        x:Uid="AddButton"
-                        Click="AddWordButton_Click"
-                        HorizontalAlignment="Stretch"
-                        IsEnabled="{x:Bind ViewModel.SelectedSection, Mode=OneWay, Converter={StaticResource NullToFalse}}"
-                        Margin="4" />
-                
-            </ListView.Footer>
+                <ListView x:Name="WordsListView"
+                          AutomationProperties.Name="WordsListView"
+                          ItemsSource="{Binding Source={StaticResource WordsViewSource}, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.SelectedWord, Mode=TwoWay}">
 
-            <ListView.Header>
-                <RelativePanel x:Name="WordsHeaderPanel"
-                               Margin="12">
+                    <ListView.Footer>
 
-                    <TextBlock x:Name="WordsHeaderTextBlock"
-                               x:Uid="WordsHeader"
-                               FontSize="16"
-                               Margin="0 0 0 12" />
-                    <TextBox x:Name="WordsSearchTextBox"
-                             x:Uid="SearchTextBox"
-                             Height="40"
-                             Margin="0 0 0 4"
-                             Padding="8"
-                             RelativePanel.AlignLeftWithPanel="True"
-                             RelativePanel.AlignRightWithPanel="True"
-                             RelativePanel.Below="WordsHeaderTextBlock" />
+                        <Button x:Name="AddWordButton"
+                                x:Uid="AddButton"
+                                Click="AddWordButton_Click"
+                                HorizontalAlignment="Stretch"
+                                IsEnabled="{x:Bind ViewModel.SelectedSection, Mode=OneWay, Converter={StaticResource NullToFalse}}"
+                                Margin="4"
+                                Style="{ThemeResource ButtonRevealStyle}" />
 
-                </RelativePanel>
-            </ListView.Header>
+                    </ListView.Footer>
 
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment"
-                            Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
+                    <ListView.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource MenuHeaderTemplate}"
+                                    HidesIfEmpty="True" />
+                    </ListView.GroupStyle>
 
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:Word">
+                    <ListView.Header>
+                        <RelativePanel x:Name="WordsHeaderPanel"
+                                       Margin="12">
 
-                    <StackPanel x:Name="WordPanel"
-                                Orientation="Vertical"
-                                Padding="0 6">
+                            <TextBlock x:Name="WordsHeaderTextBlock"
+                                       x:Uid="WordsHeader"
+                                       FontSize="16"
+                                       Margin="0 0 0 12" />
+                            <TextBox x:Name="WordsSearchTextBox"
+                                     x:Uid="SearchTextBox"
+                                     Height="40"
+                                     Margin="0 0 0 4"
+                                     Padding="8"
+                                     RelativePanel.AlignLeftWithPanel="True"
+                                     RelativePanel.AlignRightWithPanel="True"
+                                     RelativePanel.Below="WordsHeaderTextBlock" />
 
-                        <StackPanel.ContextFlyout>
-                            <MenuFlyout x:Name="WordContextFlyout">
+                        </RelativePanel>
+                    </ListView.Header>
 
-                                <MenuFlyout.MenuFlyoutPresenterStyle>
-                                    <Style TargetType="MenuFlyoutPresenter">
-                                        <Setter Property="Background"
-                                                Value="{ThemeResource SystemControlAcrylicElementBrush}" />
-                                    </Style>
-                                </MenuFlyout.MenuFlyoutPresenterStyle>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
 
-                                <MenuFlyoutItem x:Name="DeleteWordMenuItem"
-                                                x:Uid="DeleteMenuItem"
-                                                Click="DeleteWordMenuItem_Click" />
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Word">
 
-                            </MenuFlyout>
-                        </StackPanel.ContextFlyout>
+                            <StackPanel x:Name="WordPanel"
+                                        Orientation="Vertical"
+                                        Padding="0 6">
+
+                                <StackPanel.ContextFlyout>
+                                    <MenuFlyout x:Name="WordContextFlyout">
+
+                                        <MenuFlyout.MenuFlyoutPresenterStyle>
+                                            <Style TargetType="MenuFlyoutPresenter">
+                                                <Setter Property="Background"
+                                                        Value="{ThemeResource SystemControlAcrylicElementBrush}" />
+                                            </Style>
+                                        </MenuFlyout.MenuFlyoutPresenterStyle>
+
+                                        <MenuFlyoutItem x:Name="DeleteWordMenuItem"
+                                                        x:Uid="DeleteMenuItem"
+                                                        Click="DeleteWordMenuItem_Click" />
+
+                                    </MenuFlyout>
+                                </StackPanel.ContextFlyout>
 
 
-                        <TextBlock x:Name="WordTextBlock"
-                                   Text="{x:Bind Text, Mode=OneWay}" />
-                        <TextBlock x:Name="TranslationTextBlock"
-                                   FontSize="12"
-                                   Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
-                                   Text="{x:Bind Translation, Mode=OneWay}" />
-                        
-                    </StackPanel>
+                                <TextBlock x:Name="WordTextBlock"
+                                           Text="{x:Bind Text, Mode=OneWay}" />
+                                <TextBlock x:Name="TranslationTextBlock"
+                                           FontSize="12"
+                                           Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
+                                           Text="{x:Bind Translation, Mode=OneWay}" />
 
-                </DataTemplate>
-            </ListView.ItemTemplate>
+                            </StackPanel>
 
-        </ListView>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
 
+                </ListView>
+
+            </SemanticZoom.ZoomedInView>
+            
+            <SemanticZoom.ZoomedOutView>
+                <GridView HorizontalAlignment="Center"
+                          ItemTemplate="{StaticResource JumpTemplate}"
+                          ItemsSource="{Binding CollectionGroups, Source={StaticResource WordsViewSource}, Mode=OneWay}"
+                          Margin="12"
+                          VerticalAlignment="Center">
+                    
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Margin"
+                                    Value="6" />
+                        </Style>
+                    </GridView.ItemContainerStyle>
+                    
+                </GridView>
+            </SemanticZoom.ZoomedOutView>
+            
+        </SemanticZoom>
+        
         <RelativePanel x:Name="DrawingPanel"
                        x:Load="{x:Bind ViewModel.SelectedWord, Mode=OneWay, Converter={StaticResource NullToFalse}}"
                        RelativePanel.AlignBottomWithPanel="True"
                        RelativePanel.AlignRightWithPanel="True"
                        RelativePanel.AlignTopWithPanel="True"
-                       RelativePanel.RightOf="WordsListView">
+                       RelativePanel.RightOf="WordsSemanticZoom">
 
             <ScrollViewer x:Name="CanvasScrollViewer"
                           AutomationProperties.Name="CanvasScrollViewer"
@@ -330,9 +392,17 @@
 
                 <AppBarToggleButton x:Name="EraserButton"
                                     Checked="EraserButton_Checked"
-                                    Icon="Delete"
                                     Label="Eraser"
-                                    Unchecked="EraserButton_Unchecked" />
+                                    Unchecked="EraserButton_Unchecked">
+
+                    <AppBarToggleButton.Icon>
+                        <FontIcon x:Name="EraserIcon"
+                                  FontFamily="/Assets/Fonts/Behrlo.ttf#Behrlo"
+                                  FontSize="24"
+                                  Glyph="&#xf103;" />
+                    </AppBarToggleButton.Icon>
+                    
+                </AppBarToggleButton>
 
             </CommandBar>
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace Behrlo.Services
 {
@@ -34,6 +35,11 @@ namespace Behrlo.Services
                 db.Words.Remove(word);
                 await db.SaveChangesAsync();
             }
+
+            var wordItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync($"{word.Id.ToString()}.gif");
+
+            if (wordItem is StorageFile wordFile)
+                await wordItem.DeleteAsync(StorageDeleteOption.PermanentDelete);
         }
 
         /// <summary>

@@ -123,12 +123,6 @@
   <data name="AddNotebookLabel.Text" xml:space="preserve">
     <value>Agregar cuaderno</value>
   </data>
-  <data name="AddSectionTextBox.PlaceholderText" xml:space="preserve">
-    <value>Nueva sección</value>
-  </data>
-  <data name="AddWordTextBox.PlaceholderText" xml:space="preserve">
-    <value>Nueva palabra</value>
-  </data>
   <data name="CancelButton.Content" xml:space="preserve">
     <value>Cancelar</value>
   </data>
@@ -139,10 +133,10 @@
     <value>Eliminar</value>
   </data>
   <data name="NewSectionTextBox.Header" xml:space="preserve">
-    <value>Sección</value>
+    <value>Nombre de la sección</value>
   </data>
   <data name="NewSectionTextBox.PlaceholderText" xml:space="preserve">
-    <value>Sección</value>
+    <value>Nombre de la sección</value>
   </data>
   <data name="NewWordTextBox.Header" xml:space="preserve">
     <value>Palabra</value>
@@ -161,6 +155,12 @@
   </data>
   <data name="ProjectNameTextBox.PlaceholderText" xml:space="preserve">
     <value>Nombre</value>
+  </data>
+  <data name="RenameSectionTextBox.Header" xml:space="preserve">
+    <value>Nombre de la sección</value>
+  </data>
+  <data name="RenameSectionTextBox.PlaceholderText" xml:space="preserve">
+    <value>Nombre de la sección</value>
   </data>
   <data name="SearchTextBox.PlaceholderText" xml:space="preserve">
     <value>Búsqueda</value>

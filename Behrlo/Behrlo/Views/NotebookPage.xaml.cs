@@ -54,7 +54,7 @@ namespace Behrlo.Views
             NewWordTextBox.Text = string.Empty;
             NewWordTranslationTextBox.Text = string.Empty;
         }
-
+        
         private void DeleteSectionMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var section = (sender as FrameworkElement).DataContext as Section;
@@ -122,6 +122,22 @@ namespace Behrlo.Views
                 Interval = TimeSpan.FromMilliseconds(400)
             };
             _saveTimer.Tick += (s, e) => StrokesModified();
+        }
+
+        private void RenameSectionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var section = (sender as FrameworkElement).DataContext as Section;
+            ViewModel.RenamingSection = section;
+            ViewModel.RenamingSectionName = section.Name;
+            var sectionContainer = SectionsListView.ContainerFromItem(section);
+            RenameSectionFlyout.ShowAt(sectionContainer as FrameworkElement);
+            RenameSectionTextBox.SelectAll();
+        }
+
+        private void RenameSectionTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.RenameSectionCommand.CanExecute(ViewModel.RenamingSection))
+                ViewModel.RenameSectionCommand.Execute(ViewModel.RenamingSection);
         }
 
         private void StrokesModified()

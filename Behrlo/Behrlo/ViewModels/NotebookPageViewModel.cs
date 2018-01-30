@@ -10,6 +10,7 @@ using Template10.Utils;
 using Windows.UI.Input.Inking;
 using Windows.Storage;
 using Behrlo.Views;
+using Behrlo.Controls;
 
 namespace Behrlo.ViewModels
 {
@@ -47,6 +48,7 @@ namespace Behrlo.ViewModels
                 AddWordCommand.RaiseCanExecuteChanged();
                 
                 await WordsService.CreateWordAsync(word);
+                Words.AddItem(word);
                 SelectedSection.Words.Add(word);
 
                 _canAddWord = true;
@@ -84,8 +86,9 @@ namespace Behrlo.ViewModels
                 _canDeleteWord = false;
                 DeleteWordCommand.RaiseCanExecuteChanged();
 
-                SelectedSection.Words.Remove(word);
                 await WordsService.DeleteWordAsync(word);
+                Words.Remove(word);
+                SelectedSection.Words.Remove(word);
 
                 _canDeleteWord = true;
                 DeleteWordCommand.RaiseCanExecuteChanged();
@@ -117,6 +120,20 @@ namespace Behrlo.ViewModels
 
         #endregion LoadWordCommand
 
+        #region RenamingSection
+
+        private Section _renamingSection = null;
+        public Section RenamingSection { get => _renamingSection; set => Set(ref _renamingSection, value); }
+
+        #endregion RenamingSection
+
+        #region RenamingSectionName
+
+        private string _renamingSectionName = null;
+        public string RenamingSectionName { get => _renamingSectionName; set => Set(ref _renamingSectionName, value); }
+
+        #endregion RenamingSectionName
+
         #region NewSection
 
         private Section _newSection = default(Section);
@@ -137,6 +154,26 @@ namespace Behrlo.ViewModels
         public Notebook Notebook { get => _notebook; set => Set(ref _notebook, value); }
 
         #endregion Notebook
+
+        #region RenameSectionCommand
+
+        private bool _canRenameSection = true;
+        private DelegateCommand<Section> _renameSectionCommand;
+        public DelegateCommand<Section> RenameSectionCommand =>
+            _renameSectionCommand ?? (_renameSectionCommand = new DelegateCommand<Section>(async (section) =>
+            {
+                _canRenameSection = false;
+                RenameSectionCommand.RaiseCanExecuteChanged();
+
+                var notebookSection = Notebook.Sections.FirstOrDefault(s => s.Id == section.Id);
+                notebookSection.Name = RenamingSectionName;
+                await SectionsService.ChangeSectionAsync(section);
+
+                _canRenameSection = true;
+                RenameSectionCommand.RaiseCanExecuteChanged();
+            }, (section) => _canRenameSection && section != null && !string.IsNullOrEmpty(RenamingSectionName.Trim())));
+
+        #endregion RenameSectionCommand
 
         #region SaveDrawingCommand
 
@@ -172,8 +209,7 @@ namespace Behrlo.ViewModels
                 if (Set(ref _selectedSection, value))
                 {
                     SelectedWord = null;
-                    var words = WordsService.GetWords(SelectedSection.Id);
-                    SelectedSection.Words.AddRange(words);
+                    LoadWordsFromSection(value);
                     AddWordCommand.RaiseCanExecuteChanged();
                 }
             }
@@ -203,6 +239,13 @@ namespace Behrlo.ViewModels
 
         #endregion WordStrokeContainer
 
+        #region Words
+
+        private GroupedObservableCollection<char, Word> _words = new GroupedObservableCollection<char, Word>((word) => word.Text.ToUpper()[0]);
+        public GroupedObservableCollection<char, Word> Words { get => _words; set => Set(ref _words, value); }
+
+        #endregion Words
+
         public async override Task OnNavigatedFromAsync(IDictionary<string, object> pageState, bool suspending)
         {
             Shell.Instance.SetApplicationTitle(null);
@@ -221,6 +264,13 @@ namespace Behrlo.ViewModels
             Notebook.Sections.AddRange(sections);
 
             await Task.CompletedTask;
+        }
+
+        private void LoadWordsFromSection(Section section)
+        {
+            section.Words.AddRange(WordsService.GetWords(SelectedSection.Id), true);
+            var groupedWords = new GroupedObservableCollection<char, Word>((word) => word.Text.ToUpper()[0], section.Words, (word) => word.Text);
+            Words.ReplaceWith(groupedWords, new WordEqualityComparer());
         }
     }
 }

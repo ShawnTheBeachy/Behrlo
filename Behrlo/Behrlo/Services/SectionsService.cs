@@ -1,4 +1,5 @@
 ﻿using Behrlo.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,20 @@ namespace Behrlo.Services
 {
     public static class SectionsService
     {
+        /// <summary>
+        /// Modifies an existing section in the database.
+        /// </summary>
+        /// <param name="section">The modified section.</param>
+        /// <returns>A Task representing the operation.</returns>
+        public static async Task ChangeSectionAsync(Section section)
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                db.Entry(section).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+            }
+        }
+
         /// <summary>
         /// Adds a new section to the database.
         /// </summary>
