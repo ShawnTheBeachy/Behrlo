@@ -96,6 +96,13 @@ namespace Behrlo.ViewModels
 
         #endregion DeleteWordCommand
 
+        #region IsLoadingSections
+
+        private bool _isLoadingSections = false;
+        public bool IsLoadingSections { get => _isLoadingSections; set => Set(ref _isLoadingSections, value); }
+
+        #endregion IsLoadingSections
+
         #region LoadWordCommand
 
         private DelegateCommand<InkStrokeContainer> _loadWordCommand;
@@ -257,11 +264,15 @@ namespace Behrlo.ViewModels
             if (!SessionState.ContainsKey(NOTEBOOK_ID))
                 throw new Exception($"Failed to find key {nameof(NOTEBOOK_ID)} in session state.");
 
+            IsLoadingSections = true;
+
             var notebookId = (Guid)SessionState[NOTEBOOK_ID];
             var notebooks = await NotebooksService.GetNotebooksAsync(id: notebookId, withSections: true);
             Notebook = notebooks.FirstOrDefault();
             var sections = SectionsService.GetSections(notebookId: notebookId);
             Notebook.Sections.AddRange(sections);
+
+            IsLoadingSections = false;
 
             await Task.CompletedTask;
         }

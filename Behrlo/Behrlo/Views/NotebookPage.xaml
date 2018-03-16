@@ -187,14 +187,23 @@
                                x:Uid="SectionsHeader"
                                FontSize="16"
                                Margin="0 0 0 12" />
+                    
                     <TextBox x:Name="SectionsSearchTextBox"
                              x:Uid="SearchTextBox"
                              Height="40"
-                             Margin="0 0 0 4"
                              Padding="8"
                              RelativePanel.AlignLeftWithPanel="True"
                              RelativePanel.AlignRightWithPanel="True"
                              RelativePanel.Below="SectionsHeaderTextBlock" />
+
+                    <ProgressRing x:Name="LoadingWordsProgressRing"
+                                  x:Load="{x:Bind ViewModel.IsLoadingSections, Mode=OneWay}"
+                                  Height="24"
+                                  IsActive="True"
+                                  Margin="0 12 0 4"
+                                  RelativePanel.AlignHorizontalCenterWithPanel="True"
+                                  RelativePanel.Below="SectionsSearchTextBox"
+                                  Width="24" />
 
                 </RelativePanel>
             </ListView.Header>
@@ -278,6 +287,7 @@
                                        x:Uid="WordsHeader"
                                        FontSize="16"
                                        Margin="0 0 0 12" />
+                            
                             <TextBox x:Name="WordsSearchTextBox"
                                      x:Uid="SearchTextBox"
                                      Height="40"

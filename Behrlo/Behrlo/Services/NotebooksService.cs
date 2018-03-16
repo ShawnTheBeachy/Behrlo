@@ -71,9 +71,7 @@ namespace Behrlo.Services
             using (var db = new ApplicationDbContext())
             {
                 var notebooks = from notebook in db.Notebooks
-                                where (
-                                    (idIsNull ? true : notebook.Id == id)
-                                )
+                                where idIsNull ? true : notebook.Id == id
                                 select notebook;
 
                 if (withSections)
